@@ -1,0 +1,472 @@
+{% extends "base.html" %}
+
+{% block title %}Enroll Member | ACM SIGBED KARE{% endblock %}
+
+{% block content %}
+<style>
+    /* Enhanced Enrollment Page Styles */
+    .enrollment-container {
+        padding: 2rem;
+        min-height: calc(100vh - 120px);
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    }
+    
+    .enrollment-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    .card-header {
+        background: linear-gradient(135deg, #0A2540 0%, #1A365D 100%);
+        color: white;
+        padding: 1.75rem 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .card-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #00B4D8, #D4AF37);
+    }
+    
+    .card-header h2 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .card-header h2 i {
+        font-size: 1.25rem;
+    }
+    
+    .card-body {
+        padding: 2.5rem;
+    }
+    
+    /* Form Styles */
+    .form-label {
+        font-weight: 600;
+        color: #0A2540;
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+        display: block;
+    }
+    
+    .required::after {
+        content: " *";
+        color: #ef4444;
+    }
+    
+    .form-control, .form-select {
+        border: 1.5px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        font-size: 0.95rem;
+        transition: all 0.2s ease;
+        background: white;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        outline: none;
+        border-color: #0066CC;
+        box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+    }
+    
+    .form-row {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.25rem;
+        margin-bottom: 1.25rem;
+    }
+    
+    .form-full-width {
+        grid-column: 1 / -1;
+    }
+    
+    /* Role Selector */
+    .role-selector {
+        margin-bottom: 1.5rem;
+    }
+    
+    .role-options {
+        display: flex;
+        gap: 0.5rem;
+        background: #f1f5f9;
+        padding: 0.25rem;
+        border-radius: 8px;
+    }
+    
+    .role-option {
+        flex: 1;
+        text-align: center;
+        padding: 0.75rem;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 500;
+        font-size: 0.875rem;
+        transition: all 0.2s ease;
+        border: 2px solid transparent;
+    }
+    
+    .role-option:hover {
+        background: white;
+        transform: translateY(-1px);
+    }
+    
+    .role-option.selected {
+        background: white;
+        border-color: #0066CC;
+        color: #0066CC;
+        box-shadow: 0 2px 8px rgba(0, 102, 204, 0.1);
+    }
+    
+    /* Student Fields Section */
+    .student-fields {
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+        border: 1px solid #e2e8f0;
+        transition: all 0.3s ease;
+    }
+    
+    .section-title {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #0066CC;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    /* Form Actions */
+    .form-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 2.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #e2e8f0;
+    }
+    
+    .btn-cancel {
+        padding: 0.75rem 1.5rem;
+        background: white;
+        color: #64748b;
+        border: 1.5px solid #e2e8f0;
+        border-radius: 8px;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+    
+    .btn-cancel:hover {
+        background: #f1f5f9;
+        border-color: #94a3b8;
+        color: #475569;
+    }
+    
+    .btn-submit {
+        padding: 0.75rem 2.5rem;
+        background: linear-gradient(135deg, #0066CC 0%, #0052A3 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .btn-submit:hover {
+        background: linear-gradient(135deg, #0052A3 0%, #004080 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 102, 204, 0.3);
+    }
+    
+    .btn-submit:active {
+        transform: translateY(0);
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .enrollment-container {
+            padding: 1rem;
+        }
+        
+        .card-body {
+            padding: 1.5rem;
+        }
+        
+        .form-row {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+        
+        .role-options {
+            flex-direction: column;
+        }
+        
+        .form-actions {
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .btn-cancel, .btn-submit {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .card-header {
+            padding: 1.5rem;
+        }
+        
+        .card-header h2 {
+            font-size: 1.25rem;
+        }
+        
+        .student-fields {
+            padding: 1.25rem;
+        }
+    }
+</style>
+
+<div class="enrollment-container">
+    <div class="enrollment-card">
+        <!-- Header -->
+        <header class="card-header">
+            <h2>
+                <i class="bi bi-person-plus"></i>
+                Manual Member Enrollment
+            </h2>
+        </header>
+
+        <!-- Form -->
+        <div class="card-body">
+            <form method="POST" id="enrollmentForm">
+                <!-- Role Selection -->
+                <div class="role-selector">
+                    <label class="form-label required">User Role</label>
+                    <div class="role-options">
+                        <div class="role-option selected" data-role="student" onclick="selectRole('student')">
+                            <i class="bi bi-person-student me-1"></i>
+                            Student
+                        </div>
+                        <div class="role-option" data-role="admin" onclick="selectRole('admin')">
+                            <i class="bi bi-person-gear me-1"></i>
+                            Faculty / Admin
+                        </div>
+                    </div>
+                    <input type="hidden" name="role" id="roleInput" value="student" required>
+                </div>
+
+                <!-- Basic Information -->
+                <div class="form-row">
+                    <div class="form-full-width">
+                        <label class="form-label required">Full Name</label>
+                        <input type="text" name="name" class="form-control" 
+                               placeholder="Enter full name" required>
+                    </div>
+                </div>
+
+                <!-- Student Specific Fields -->
+                <div id="studentFields" class="student-fields">
+                    <div class="section-title">
+                        <i class="bi bi-mortarboard"></i>
+                        Student Information
+                    </div>
+                    
+                    <div class="form-row">
+                        <div>
+                            <label class="form-label required">Register Number</label>
+                            <input type="text" name="register_number" class="form-control" 
+                                   placeholder="9923005200" required>
+                        </div>
+                        
+                        <div>
+                            <label class="form-label required">Department</label>
+                            <select name="dept" class="form-select" required>
+                                <option value="" selected disabled>Select Department</option>
+                                <option value="CSE">Computer Science Engineering</option>
+                                <option value="IT">Information Technology</option>
+                                <option value="ECE">Electronics & Communication</option>
+                                <option value="EEE">Electrical & Electronics</option>
+                                <option value="MECH">Mechanical Engineering</option>
+                                <option value="CIVIL">Civil Engineering</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div>
+                            <label class="form-label required">Section</label>
+                            <input type="text" name="section" class="form-control" 
+                                   placeholder="e.g. A, B, C" required>
+                        </div>
+                        
+                        <div>
+                            <label class="form-label required">SIGBED Team</label>
+                            <select name="sigbed_team" class="form-select" required>
+                                <option value="" selected disabled>Select Team</option>
+                                <option value="Lens and Edit Team">Lens and Edit Team</option>
+                                <option value="Documentation Team">Documentation Team</option>
+                                <option value="Web Development Team">Web Development Team</option>
+                                <option value="Public Relations Team">Public Relations Team</option>
+                                <option value="Event Management Team">Event Management Team</option>
+                                <option value="Research and Analysis Team">Research and Analysis Team</option>
+                                <option value="Outreach Team">Outreach Team</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Credentials -->
+                <div class="form-row">
+                    <div>
+                        <label class="form-label required">Username</label>
+                        <input type="text" name="username" class="form-control" 
+                               placeholder="Choose a username" required>
+                    </div>
+                    
+                    <div>
+                        <label class="form-label required">Temporary Password</label>
+                        <div style="position: relative;">
+                            <input type="password" id="password" name="password" 
+                                   class="form-control" 
+                                   placeholder="Set temporary password" required>
+                            <button type="button" class="toggle-password" onclick="togglePassword()" 
+                                    style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #64748b; cursor: pointer;">
+                                <i class="bi bi-eye" id="toggleIcon"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="form-actions">
+                    <a href="{{ url_for('admin.admin_dashboard') }}" class="btn-cancel">
+                        <i class="bi bi-arrow-left me-1"></i>
+                        Back to Dashboard
+                    </a>
+                    <button type="submit" class="btn-submit" id="submitBtn">
+                        <i class="bi bi-check-lg"></i>
+                        Enroll Student
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// Role Selection
+function selectRole(role) {
+    const options = document.querySelectorAll('.role-option');
+    const roleInput = document.getElementById('roleInput');
+    const studentFields = document.getElementById('studentFields');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    // Update active option
+    options.forEach(opt => {
+        if (opt.dataset.role === role) {
+            opt.classList.add('selected');
+        } else {
+            opt.classList.remove('selected');
+        }
+    });
+    
+    // Update hidden input
+    roleInput.value = role;
+    
+    // Show/hide student fields
+    if (role === 'admin') {
+        studentFields.style.display = 'none';
+        submitBtn.innerHTML = '<i class="bi bi-check-lg"></i> Enroll Faculty/Admin';
+        
+        // Remove required from student fields
+        const studentInputs = studentFields.querySelectorAll('[required]');
+        studentInputs.forEach(input => {
+            input.required = false;
+        });
+    } else {
+        studentFields.style.display = 'block';
+        submitBtn.innerHTML = '<i class="bi bi-check-lg"></i> Enroll Student';
+        
+        // Add required back to student fields
+        const studentInputs = studentFields.querySelectorAll('input, select');
+        studentInputs.forEach(input => {
+            if (input.name !== 'dept' && input.name !== 'sigbed_team') {
+                input.required = true;
+            }
+        });
+    }
+}
+
+// Password toggle
+function togglePassword() {
+    const passwordInput = document.getElementById('password');
+    const toggleIcon = document.getElementById('toggleIcon');
+    
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        toggleIcon.classList.remove('bi-eye');
+        toggleIcon.classList.add('bi-eye-slash');
+    } else {
+        passwordInput.type = 'password';
+        toggleIcon.classList.remove('bi-eye-slash');
+        toggleIcon.classList.add('bi-eye');
+    }
+}
+
+// Form validation and submission
+document.getElementById('enrollmentForm').addEventListener('submit', function(e) {
+    const submitBtn = this.querySelector('.btn-submit');
+    const originalText = submitBtn.innerHTML;
+    
+    // Show loading state
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="bi bi-arrow-clockwise spin"></i> Processing...';
+    
+    // Add spin animation
+    submitBtn.querySelector('.spin').style.animation = 'spin 1s linear infinite';
+    
+    // Re-enable if validation fails
+    setTimeout(() => {
+        if (!this.checkValidity()) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
+        }
+    }, 1000);
+});
+
+// Add spin animation
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+`;
+document.head.appendChild(style);
+</script>
+{% endblock %}

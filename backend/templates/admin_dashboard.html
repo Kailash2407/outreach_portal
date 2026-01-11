@@ -1,0 +1,735 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard | ACM SIGBED KARE{% endblock %}
+
+{% block content %}
+<main class="container-fluid py-4">
+    <header class="dashboard-header mb-4">
+        <div class="row align-items-center">
+            <div class="col">
+                <div class="header-badge mb-2">
+                    <i class="bi bi-shield-lock me-2"></i>Admin Control Center
+                </div>
+                <h1 class="fw-bold mb-1">Administrative Dashboard</h1>
+                <p class="header-tagline mb-0">Outreach Program Lifecycle: Enrollment & Formation</p>
+            </div>
+            <div class="col-auto d-none d-md-block">
+                <div class="header-icon">
+                    <i class="bi bi-gear-wide-connected"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="stats-section mb-5">
+        <div class="row g-4">
+            <article class="col-md-4">
+                <div class="stat-card stat-primary">
+                    <div class="stat-icon">
+                        <i class="bi bi-person-fill"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-label">Total Students</div>
+                        <h2 class="stat-value">{{ total_students }}</h2>
+                    </div>
+                    <div class="stat-decoration"></div>
+                </div>
+            </article>
+            <article class="col-md-4">
+                <div class="stat-card stat-warning">
+                    <div class="stat-icon">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-label">Unpaired Students</div>
+                        <h2 class="stat-value">{{ unpaired }}</h2>
+                    </div>
+                    <div class="stat-decoration"></div>
+                </div>
+            </article>
+            <article class="col-md-4">
+                <div class="stat-card stat-success">
+                    <div class="stat-icon">
+                        <i class="bi bi-ui-checks-grid"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-label">Final Teams</div>
+                        <h2 class="stat-value">{{ total_teams }}</h2>
+                    </div>
+                    <div class="stat-decoration"></div>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <section class="actions-section">
+        <div class="row g-4">
+            <article class="col-md-6">
+                <div class="action-card">
+                    <div class="action-icon-wrap">
+                        <i class="bi bi-person-plus-fill"></i>
+                    </div>
+                    <div class="action-content">
+                        <h5 class="fw-bold mb-2">User Management</h5>
+                        <p class="text-muted small mb-3">Register new students and faculty. Manage permissions and account status.</p>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <a href="{{ url_for('admin.enroll_student') }}" class="btn-action btn-action-primary">
+                                <i class="bi bi-plus-lg me-1"></i>Enroll New
+                            </a>
+                            <a href="{{ url_for('admin.view_enrollments') }}" class="btn-action btn-action-outline">
+                                <i class="bi bi-list-ul me-1"></i>View Directory
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </article>
+            <article class="col-md-6">
+                <div class="action-card">
+                    <div class="action-icon-wrap">
+                        <i class="bi bi-diagram-3-fill"></i>
+                    </div>
+                    <div class="action-content">
+                        <h5 class="fw-bold mb-2">Team Organization</h5>
+                        <p class="text-muted small mb-3">Review student pairings and assemble final outreach units (2+2 model).</p>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <a href="{{ url_for('admin.create_team') }}" class="btn-action btn-action-primary">
+                                <i class="bi bi-plus-lg me-1"></i>Assemble Team
+                            </a>
+                            <a href="{{ url_for('admin.view_teams') }}" class="btn-action btn-action-outline">
+                                <i class="bi bi-grid me-1"></i>Team Gallery
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </section>
+
+    <!-- CSV Export Section - ADDED -->
+    <section class="export-section mt-5">
+        <div class="export-card">
+            <div class="export-header">
+                <i class="bi bi-download"></i>
+                <div>
+                    <h5 class="fw-bold mb-1">Data Export Center</h5>
+                    <p class="export-subtitle mb-0">Export program data for analysis and reporting</p>
+                </div>
+            </div>
+            
+            <div class="export-options">
+                <div class="export-option">
+                    <div class="export-icon">
+                        <i class="bi bi-file-earmark-person"></i>
+                    </div>
+                    <div class="export-content">
+                        <h6>Student Directory</h6>
+                        <p>Export complete list of enrolled students with academic details</p>
+                        <a href="{{ url_for('admin.export_students_csv') }}" class="export-btn export-btn-primary">
+                            <i class="bi bi-download me-1"></i>
+                            Export Students CSV
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="export-option">
+                    <div class="export-icon">
+                        <i class="bi bi-people"></i>
+                    </div>
+                    <div class="export-content">
+                        <h6>Team Roster</h6>
+                        <p>Export all teams with member assignments and team details</p>
+                        <a href="{{ url_for('admin.export_teams_csv') }}" class="export-btn export-btn-success">
+                            <i class="bi bi-download me-1"></i>
+                            Export Teams CSV
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</main>
+<style>
+    /* Enhanced Dashboard Styles */
+    .dashboard-header {
+        background: linear-gradient(135deg, 
+            rgba(10, 37, 64, 0.98) 0%, 
+            rgba(26, 54, 93, 0.95) 50%, 
+            rgba(10, 37, 64, 0.98) 100%);
+        border-radius: 16px;
+        padding: 2.5rem;
+        color: white;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 8px 32px rgba(10, 37, 64, 0.25);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .dashboard-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: 
+            radial-gradient(circle at 20% 30%, rgba(0, 180, 216, 0.15) 0%, transparent 50%),
+            radial-gradient(circle at 80% 70%, rgba(212, 175, 55, 0.1) 0%, transparent 50%);
+        pointer-events: none;
+    }
+    
+    .header-badge {
+        display: inline-flex;
+        align-items: center;
+        background: rgba(0, 180, 216, 0.2);
+        backdrop-filter: blur(10px);
+        color: #00B4D8;
+        padding: 0.5rem 1.25rem;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 1rem;
+        border: 1px solid rgba(0, 180, 216, 0.3);
+    }
+    
+    .dashboard-header h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0 0 0.5rem 0;
+        background: linear-gradient(135deg, #FFFFFF 0%, #E6F2FF 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .header-tagline {
+        color: rgba(255, 255, 255, 0.85);
+        font-size: 1rem;
+        margin: 0;
+        max-width: 600px;
+    }
+    
+    .header-icon {
+        width: 70px;
+        height: 70px;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        color: #00B4D8;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    }
+    
+    /* Enhanced Stats Cards */
+    .stat-card {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 16px;
+        padding: 1.75rem;
+        display: flex;
+        align-items: center;
+        gap: 1.25rem;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 16px 32px rgba(0, 0, 0, 0.12);
+    }
+    
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.75rem;
+        flex-shrink: 0;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    .stat-primary .stat-icon {
+        background: linear-gradient(135deg, #0A2540 0%, #1A365D 100%);
+        color: white;
+    }
+    
+    .stat-warning .stat-icon {
+        background: linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%);
+        color: white;
+    }
+    
+    .stat-success .stat-icon {
+        background: linear-gradient(135deg, #10B981 0%, #34D399 100%);
+        color: white;
+    }
+    
+    .stat-label {
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #64748B;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-value {
+        font-size: 2.25rem;
+        font-weight: 700;
+        color: #0A2540;
+        margin: 0;
+        line-height: 1;
+    }
+    
+    .stat-decoration {
+        position: absolute;
+        right: -20px;
+        bottom: -20px;
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        opacity: 0.08;
+        z-index: 0;
+    }
+    
+    .stat-primary .stat-decoration {
+        background: #0A2540;
+    }
+    
+    .stat-warning .stat-decoration {
+        background: #F59E0B;
+    }
+    
+    .stat-success .stat-decoration {
+        background: #10B981;
+    }
+    
+    /* Enhanced Action Cards */
+    .action-card {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 16px;
+        padding: 2rem;
+        height: 100%;
+        display: flex;
+        gap: 1.5rem;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+    }
+    
+    .action-card:hover {
+        box-shadow: 0 16px 32px rgba(0, 0, 0, 0.12);
+        transform: translateY(-5px);
+    }
+    
+    .action-icon-wrap {
+        width: 56px;
+        height: 56px;
+        background: linear-gradient(135deg, #0A2540 0%, #1A365D 100%);
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: white;
+        flex-shrink: 0;
+        box-shadow: 0 4px 12px rgba(10, 37, 64, 0.2);
+    }
+    
+    .action-content {
+        flex: 1;
+    }
+    
+    .action-content h5 {
+        font-size: 1.25rem;
+        color: #0A2540;
+        margin: 0 0 0.75rem 0;
+        font-weight: 700;
+    }
+    
+    .action-content p {
+        color: #64748B;
+        font-size: 0.9rem;
+        line-height: 1.5;
+        margin: 0 0 1.25rem 0;
+    }
+    
+    .btn-action {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.75rem 1.25rem;
+        border-radius: 10px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        border: none;
+        cursor: pointer;
+    }
+    
+    .btn-action-primary {
+        background: linear-gradient(135deg, #0A2540 0%, #1A365D 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(10, 37, 64, 0.2);
+    }
+    
+    .btn-action-primary:hover {
+        background: linear-gradient(135deg, #1A365D 0%, #0A2540 100%);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(10, 37, 64, 0.3);
+    }
+    
+    .btn-action-outline {
+        background: transparent;
+        color: #0A2540;
+        border: 1.5px solid #E2E8F0;
+    }
+    
+    .btn-action-outline:hover {
+        background: #F8FAFC;
+        border-color: #0A2540;
+        color: #0A2540;
+        transform: translateY(-2px);
+    }
+    
+    /* CSV Export Section Styles - ADDED */
+    .export-section {
+        margin-top: 2rem;
+    }
+    
+    .export-card {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        backdrop-filter: blur(10px);
+    }
+    
+    .export-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    
+    .export-header i {
+        font-size: 1.75rem;
+        color: #10B981;
+        width: 50px;
+        height: 50px;
+        background: rgba(16, 185, 129, 0.1);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .export-header h5 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #0A2540;
+        margin: 0 0 0.25rem 0;
+    }
+    
+    .export-subtitle {
+        color: #64748B;
+        font-size: 0.9rem;
+        margin: 0;
+    }
+    
+    .export-options {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .export-option {
+        background: #F8FAFC;
+        border-radius: 12px;
+        padding: 1.5rem;
+        border: 1px solid #E2E8F0;
+        transition: all 0.3s ease;
+    }
+    
+    .export-option:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        border-color: #CBD5E0;
+    }
+    
+    .export-icon {
+        width: 48px;
+        height: 48px;
+        background: linear-gradient(135deg, #0A2540 0%, #1A365D 100%);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        color: white;
+        margin-bottom: 1rem;
+    }
+    
+    .export-option:nth-child(2) .export-icon {
+        background: linear-gradient(135deg, #10B981 0%, #34D399 100%);
+    }
+    
+    .export-content h6 {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #0A2540;
+        margin: 0 0 0.5rem 0;
+    }
+    
+    .export-content p {
+        color: #64748B;
+        font-size: 0.85rem;
+        line-height: 1.5;
+        margin: 0 0 1rem 0;
+    }
+    
+    .export-btn {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.625rem 1.25rem;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .export-btn-primary {
+        background: linear-gradient(135deg, #0A2540 0%, #1A365D 100%);
+        color: white;
+    }
+    
+    .export-btn-primary:hover {
+        background: linear-gradient(135deg, #1A365D 0%, #0A2540 100%);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(10, 37, 64, 0.3);
+    }
+    
+    .export-btn-success {
+        background: linear-gradient(135deg, #10B981 0%, #34D399 100%);
+        color: white;
+    }
+    
+    .export-btn-success:hover {
+        background: linear-gradient(135deg, #0DA271 0%, #10B981 100%);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+    
+    /* Container improvements */
+    .container-fluid {
+        padding: 2rem;
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        min-height: calc(100vh - 120px);
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .container-fluid {
+            padding: 1.5rem;
+        }
+        
+        .dashboard-header {
+            padding: 1.75rem;
+            text-align: center;
+        }
+        
+        .header-badge {
+            margin: 0 auto 1rem;
+        }
+        
+        .header-icon {
+            display: none;
+        }
+        
+        .dashboard-header h1 {
+            font-size: 1.75rem;
+        }
+        
+        .stat-card {
+            padding: 1.5rem;
+            flex-direction: column;
+            text-align: center;
+            gap: 1rem;
+        }
+        
+        .stat-icon {
+            margin: 0 auto;
+        }
+        
+        .action-card {
+            flex-direction: column;
+            text-align: center;
+            padding: 1.5rem;
+        }
+        
+        .action-icon-wrap {
+            margin: 0 auto;
+        }
+        
+        .action-card .d-flex {
+            justify-content: center;
+        }
+        
+        .export-options {
+            grid-template-columns: 1fr;
+        }
+        
+        .export-card {
+            padding: 1.5rem;
+        }
+        
+        .export-header {
+            flex-direction: column;
+            text-align: center;
+            gap: 0.75rem;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .container-fluid {
+            padding: 1rem;
+        }
+        
+        .dashboard-header {
+            padding: 1.5rem;
+        }
+        
+        .dashboard-header h1 {
+            font-size: 1.5rem;
+        }
+        
+        .header-tagline {
+            font-size: 0.9rem;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+        }
+        
+        .btn-action {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .action-card .d-flex {
+            flex-direction: column;
+        }
+    }
+</style>
+
+<script>
+    // Add subtle animations
+    document.addEventListener('DOMContentLoaded', function() {
+        // Animate stats cards on load
+        const statCards = document.querySelectorAll('.stat-card');
+        statCards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                card.style.transition = 'all 0.4s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, 100 * index);
+        });
+        
+        // Animate action cards
+        const actionCards = document.querySelectorAll('.action-card');
+        setTimeout(() => {
+            actionCards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    card.style.transition = 'all 0.4s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, 200 + (100 * index));
+            });
+        }, 300);
+        
+        // Animate export cards
+        const exportCards = document.querySelectorAll('.export-option');
+        setTimeout(() => {
+            exportCards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    card.style.transition = 'all 0.4s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, 400 + (100 * index));
+            });
+        }, 500);
+        
+        // Add hover effect to buttons
+        const buttons = document.querySelectorAll('.btn-action, .export-btn');
+        buttons.forEach(button => {
+            button.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-2px)';
+            });
+            
+            button.addEventListener('mouseleave', function() {
+                if (!this.classList.contains('hover')) {
+                    this.style.transform = 'translateY(0)';
+                }
+            });
+        });
+        
+        // Add export loading animation
+        const exportLinks = document.querySelectorAll('[href*="export"]');
+        exportLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                const originalHTML = this.innerHTML;
+                this.innerHTML = '<i class="bi bi-arrow-clockwise spin me-1"></i>Exporting...';
+                this.classList.add('hover');
+                
+                // Reset after 2 seconds or when download completes
+                setTimeout(() => {
+                    this.innerHTML = originalHTML;
+                    this.classList.remove('hover');
+                }, 2000);
+            });
+        });
+        
+        // Add spin animation for export
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+            .spin {
+                animation: spin 1s linear infinite;
+            }
+        `;
+        document.head.appendChild(style);
+    });
+</script>
+{% endblock %}

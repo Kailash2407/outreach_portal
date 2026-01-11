@@ -1,0 +1,257 @@
+{% extends "base.html" %}
+
+{% block title %}My Team | Outreach Portal{% endblock %}
+
+{% block content %}
+<main class="container py-5">
+    <!-- Page Header -->
+    <div class="text-center mb-5">
+        <div class="icon-wrapper bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center p-4 mb-4">
+            <i class="bi bi-people-fill fs-1 text-success"></i>
+        </div>
+        <h1 class="fw-bold mb-3">Team Overview</h1>
+        <p class="lead text-muted mb-0">Your 4-member learning squad is ready for outreach activities</p>
+    </div>
+
+    <!-- Mission Summary -->
+    <div class="card border-0 shadow-sm mb-5">
+        <div class="card-header bg-white border-bottom py-4">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-bullseye fs-4 text-success me-3"></i>
+                <div>
+                    <h2 class="h5 fw-bold mb-0">Mission Details</h2>
+                    <small class="text-muted">Assigned outreach information</small>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="d-flex align-items-start p-3 border rounded bg-light h-100">
+                        <i class="bi bi-geo-alt fs-4 text-primary me-3"></i>
+                        <div>
+                            <h6 class="fw-bold mb-2 text-secondary">School</h6>
+                            <div class="fw-semibold text-dark">{{ team.school_name or 'To be assigned' }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="d-flex align-items-start p-3 border rounded bg-light h-100">
+                        <i class="bi bi-calendar-event fs-4 text-primary me-3"></i>
+                        <div>
+                            <h6 class="fw-bold mb-2 text-secondary">Outreach Date</h6>
+                            <div class="fw-semibold text-dark">{{ team.outreach_date or 'To be scheduled' }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="d-flex align-items-start p-3 border rounded bg-light h-100">
+                        <i class="bi bi-book fs-4 text-primary me-3"></i>
+                        <div>
+                            <h6 class="fw-bold mb-2 text-secondary">Topic</h6>
+                            <div class="fw-semibold text-dark">{{ team.topic or 'To be announced' }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Team Members -->
+    <div class="card border-0 shadow-sm mb-5">
+        <div class="card-header bg-white border-bottom py-4">
+            <div class="d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-person-badge fs-4 text-primary me-3"></i>
+                    <div>
+                        <h2 class="h5 fw-bold mb-0">Team Members</h2>
+                        <small class="text-muted">Your 4-member squad</small>
+                    </div>
+                </div>
+                <span class="badge bg-primary rounded-pill px-3 py-2">4 Students</span>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row g-4">
+                {% for pair in team.pairs %}
+                <div class="col-lg-6">
+                    <div class="card border h-100">
+                        <div class="card-header bg-white border-bottom py-3">
+                            <div class="d-flex align-items-center">
+                                <span class="badge bg-primary me-2">Pair {{ loop.index }}</span>
+                                <i class="bi bi-link-45deg text-muted"></i>
+                            </div>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="row g-4">
+                                {% for student in pair.students %}
+                                <div class="col-6">
+                                    <div class="text-center">
+                                        <div class="student-avatar bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center p-3 mb-3">
+                                            <i class="bi bi-person fs-3 text-primary"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="fw-bold mb-1">{{ student.name }}</h6>
+                                            <div class="small text-muted mb-2">{{ student.dept }} - {{ student.section }}</div>
+                                            <span class="badge bg-secondary bg-opacity-10 text-secondary">
+                                                {{ student.sigbed_team }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Materials Section -->
+    <div class="card border-0 shadow-sm mb-5">
+        <div class="card-header bg-white border-bottom py-4">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-folder-fill fs-4 text-primary me-3"></i>
+                <div>
+                    <h2 class="h5 fw-bold mb-0">Learning Materials</h2>
+                    <small class="text-muted">Download resources for your outreach session</small>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            {% if team.material_filename %}
+            <div class="alert alert-success d-flex align-items-center" role="alert">
+                <i class="bi bi-check-circle-fill fs-4 me-3"></i>
+                <div>
+                    <strong>Materials Available</strong>
+                    <div class="small">Download the prepared materials for your outreach session.</div>
+                </div>
+            </div>
+            
+            <div class="row justify-content-center">
+                <div class="col-md-10">
+                    <div class="p-4 border rounded bg-white">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-wrapper bg-success bg-opacity-10 rounded-3 p-3 me-3">
+                                        <i class="bi bi-file-earmark-pdf fs-2 text-success"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="fw-bold mb-1">Outreach Session Materials</h6>
+                                        <div class="small text-muted">
+                                            <i class="bi bi-file-earmark me-1"></i> {{ team.material_filename }}
+                                        </div>
+                                        <div class="small text-muted mt-1">
+                                            <i class="bi bi-info-circle me-1"></i> Contains session plans, activities, and resources
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                                <a href="{{ url_for('static', filename='uploads/' + team.material_filename) }}" 
+                                   class="btn btn-primary px-4 py-3 fw-bold" download>
+                                    <i class="bi bi-download me-2"></i>Download Materials
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <div class="icon-wrapper bg-light rounded-circle d-inline-flex align-items-center justify-content-center p-4 mb-4">
+                    <i class="bi bi-hourglass fs-2 text-secondary"></i>
+                </div>
+                <h5 class="fw-bold text-secondary mb-3">Materials Pending</h5>
+                <p class="text-muted mb-4">
+                    The outreach materials for your session are currently being prepared.
+                    <br>You'll be notified once they become available for download.
+                </p>
+                <div class="d-flex justify-content-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Return to Dashboard -->
+    <div class="text-center">
+        <a href="{{ url_for('student.student_dashboard') }}" class="btn btn-primary px-5 py-3 fw-bold">
+            <i class="bi bi-arrow-left me-2"></i>
+            Return to Dashboard
+        </a>
+    </div>
+</main>
+
+<style>
+    .icon-wrapper {
+        width: 80px;
+        height: 80px;
+        transition: transform 0.3s ease;
+    }
+    
+    .icon-wrapper:hover {
+        transform: scale(1.05);
+    }
+    
+    .student-avatar {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .card {
+        border-radius: 0.75rem;
+    }
+    
+    .card-header {
+        background-color: #f8f9fa;
+    }
+    
+    .border {
+        border-color: #e9ecef !important;
+    }
+    
+    .bg-light {
+        background-color: #f8f9fa !important;
+    }
+    
+    .btn-primary {
+        background-color: #0d6efd;
+        border-color: #0d6efd;
+        transition: all 0.2s ease;
+    }
+    
+    .btn-primary:hover {
+        background-color: #0b5ed7;
+        border-color: #0a58ca;
+        transform: translateY(-1px);
+    }
+    
+    .badge {
+        font-weight: 500;
+    }
+    
+    @media (max-width: 768px) {
+        .icon-wrapper {
+            width: 60px;
+            height: 60px;
+        }
+        
+        .student-avatar {
+            width: 60px;
+            height: 60px;
+        }
+        
+        .btn {
+            padding: 0.75rem;
+            font-size: 0.9375rem;
+        }
+    }
+</style>
+{% endblock %}

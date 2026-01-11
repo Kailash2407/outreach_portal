@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Assign Outreach | Admin{% endblock %}
+
+{% block content %}
+<main class="container-fluid py-4">
+    <header class="card border-0 shadow-lg rounded-4 overflow-hidden mb-4 bg-gradient-primary text-white">
+        <div class="card-body p-4">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h1 class="fw-bold mb-0">
+                        <i class="bi bi-geo-alt-fill me-3 text-info"></i>Outreach Assignments
+                    </h1>
+                </div>
+                <div class="col-auto">
+                    <a href="{{ url_for('admin.admin_dashboard') }}" class="btn btn-light">
+                        <i class="bi bi-arrow-left me-1"></i>Back
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="row g-4">
+        {% for team in teams %}
+        <article class="col-md-6">
+            <div class="card border-0 shadow-sm rounded-4 h-100">
+                <header class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <h5 class="fw-bold text-primary mb-0">{{ team.team_name }}</h5>
+                        <span class="badge bg-info bg-opacity-25 text-info border border-info rounded-pill">Team #{{ team.id }}</span>
+                    </div>
+                    <p class="text-muted small mb-3">
+                        <strong>Members:</strong> 
+                        {% for pair in team.pairs %}{% for s in pair.students %}{{ s.name }}{% if not loop.last %}, {% endif %}{% endfor %}{% if not loop.last %} | {% endif %}{% endfor %}
+                    </p>
+                </header>
+                <div class="card-body pt-0">
+                    <hr class="my-3">
+                    
+                    <form method="POST">
+                        <input type="hidden" name="team_id" value="{{ team.id }}">
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-primary text-uppercase small">SCHOOL NAME</label>
+                            <input type="text" name="school_name" class="form-control" value="{{ team.school_name or '' }}" placeholder="Enter School Name" required>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <label class="form-label fw-bold text-primary text-uppercase small">DATE</label>
+                                <input type="date" name="outreach_date" class="form-control" value="{{ team.outreach_date or '' }}" required>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label fw-bold text-primary text-uppercase small">TIME SLOT</label>
+                                <input type="text" name="time_interval" class="form-control" value="{{ team.time_interval or '' }}" placeholder="e.g. 9AM-12PM">
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-primary text-uppercase small">TEACHING TOPIC</label>
+                            <input type="text" name="topic" class="form-control" value="{{ team.topic or '' }}" placeholder="e.g. Introduction to Python">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-primary text-uppercase small">MATERIAL LINK</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-primary text-white border-0">
+                                    <i class="bi bi-link-45deg"></i>
+                                </span>
+                                <input type="url" name="material_link" class="form-control" value="{{ team.material_link or '' }}" placeholder="Drive link for PPT/PDF">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-check2-circle me-2"></i>Update Mission Details
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </article>
+        {% else %}
+        <article class="col-12">
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body p-5 text-center">
+                    <i class="bi bi-people text-muted display-1 mb-3"></i>
+                    <h4 class="text-muted">No teams assembled yet</h4>
+                    <p class="text-muted">Go to "Manage Teams" first to create outreach teams.</p>
+                </div>
+            </div>
+        </article>
+        {% endfor %}
+    </section>
+</main>
+{% endblock %}

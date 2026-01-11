@@ -1,0 +1,330 @@
+{% extends "base.html" %}
+
+{% block title %}Student Registration | ACM SIGBED KARE{% endblock %}
+
+{% block content %}
+<style>
+    /* Clean Registration Styles */
+    .registration-wrapper {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    }
+    
+    .registration-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 500px;
+        overflow: hidden;
+    }
+    
+    .card-header {
+        background: linear-gradient(135deg, #0A2540 0%, #1A365D 100%);
+        color: white;
+        padding: 25px;
+        text-align: center;
+    }
+    
+    .card-header h2 {
+        font-size: 1.5rem;
+        margin: 0 0 5px 0;
+        font-weight: 600;
+    }
+    
+    .card-header p {
+        opacity: 0.9;
+        font-size: 0.9rem;
+        margin: 0;
+    }
+    
+    .card-body {
+        padding: 25px;
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-label {
+        display: block;
+        font-weight: 500;
+        color: #2d3748;
+        margin-bottom: 6px;
+        font-size: 0.875rem;
+    }
+    
+    .required::after {
+        content: " *";
+        color: #e53e3e;
+    }
+    
+    .form-control, .form-select {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        font-size: 0.95rem;
+        transition: border 0.2s;
+        background: white;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        outline: none;
+        border-color: #4299e1;
+        box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+    }
+    
+    .row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+    
+    .full-width {
+        grid-column: 1 / -1;
+    }
+    
+    .credentials-section {
+        background: #f7fafc;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 25px 0;
+        border: 1px solid #e2e8f0;
+    }
+    
+    .section-title {
+        color: #2d3748;
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .submit-btn {
+        width: 100%;
+        padding: 12px;
+        background: #0066CC;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    
+    .submit-btn:hover {
+        background: #0052a3;
+    }
+    
+    .login-link {
+        text-align: center;
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid #e2e8f0;
+        color: #4a5568;
+        font-size: 0.9rem;
+    }
+    
+    .login-link a {
+        color: #0066CC;
+        text-decoration: none;
+        font-weight: 500;
+    }
+    
+    .login-link a:hover {
+        text-decoration: underline;
+    }
+    
+    /* Password toggle */
+    .password-wrapper {
+        position: relative;
+    }
+    
+    .toggle-password {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: #718096;
+        cursor: pointer;
+        padding: 5px;
+    }
+    
+    /* Responsive */
+    @media (max-width: 600px) {
+        .registration-card {
+            max-width: 100%;
+        }
+        
+        .row {
+            grid-template-columns: 1fr;
+        }
+        
+        .card-header, .card-body {
+            padding: 20px;
+        }
+    }
+    
+    @media (max-width: 400px) {
+        .registration-wrapper {
+            padding: 15px;
+        }
+        
+        .card-header, .card-body {
+            padding: 15px;
+        }
+    }
+</style>
+
+<div class="registration-wrapper">
+    <div class="registration-card">
+        <!-- Header -->
+        <div class="card-header">
+            <h2>Student Registration</h2>
+            <p>ACM SIGBED KARE Outreach Program</p>
+        </div>
+        
+        <!-- Form -->
+        <div class="card-body">
+            <form method="POST" id="registrationForm">
+                <!-- Personal Information -->
+                <div class="form-group full-width">
+                    <label class="form-label required">Full Name</label>
+                    <input type="text" name="name" class="form-control" 
+                           placeholder="John Doe" required>
+                </div>
+                
+                <div class="row">
+                    <div class="form-group">
+                        <label class="form-label required">Register Number</label>
+                        <input type="text" name="register_number" class="form-control" 
+                               placeholder="9923005200" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label required">Department</label>
+                        <select name="dept" class="form-select" required>
+                            <option value="" selected disabled>Select Department</option>
+                            <option value="CSE">CSE</option>
+                            <option value="IT">IT</option>
+                            <option value="ECE">ECE</option>
+                            <option value="EEE">EEE</option>
+                            <option value="MECH">MECH</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="form-group">
+                        <label class="form-label required">Section</label>
+                        <input type="text" name="section" class="form-control" 
+                               placeholder="A" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label required">SIGBED Team</label>
+                        <select name="sigbed_team" class="form-select" required>
+                            <option value="" selected disabled>Select Team</option>
+                            <option value="Lens and Edit Team">Lens and Edit Team</option>
+                            <option value="Documentation Team">Documentation Team</option>
+                            <option value="Web Development Team">Web Development Team</option>
+                            <option value="Public Relations Team">Public Relations Team</option>
+                            <option value="Event Management Team">Event Management Team</option>
+                            <option value="Research and Analysis Team">Research and Analysis Team</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Credentials -->
+                <div class="credentials-section">
+                    <div class="section-title">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                        </svg>
+                        Login Credentials
+                    </div>
+                    
+                    <div class="row">
+                        <div class="form-group">
+                            <label class="form-label required">Username</label>
+                            <input type="text" name="username" class="form-control" 
+                                   placeholder="john_doe" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label required">Password</label>
+                            <div class="password-wrapper">
+                                <input type="password" id="password" name="password" 
+                                       class="form-control" 
+                                       placeholder="••••••••" required>
+                                <button type="button" class="toggle-password" onclick="togglePassword()">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                        <circle cx="12" cy="12" r="3"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Submit -->
+                <button type="submit" class="submit-btn">
+                    Create Account
+                </button>
+                
+                <!-- Login Link -->
+                <div class="login-link">
+                    Already have an account? 
+                    <a href="{{ url_for('auth.login') }}">Sign In</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function togglePassword() {
+    const password = document.getElementById('password');
+    const button = document.querySelector('.toggle-password svg');
+    
+    if (password.type === 'password') {
+        password.type = 'text';
+        button.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
+    } else {
+        password.type = 'password';
+        button.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+    }
+}
+
+// Simple form validation
+document.getElementById('registrationForm').addEventListener('submit', function(e) {
+    const submitBtn = this.querySelector('.submit-btn');
+    const originalText = submitBtn.textContent;
+    
+    // Disable button and show loading
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Creating...';
+    submitBtn.style.opacity = '0.7';
+    
+    // Re-enable if validation fails
+    if (!this.checkValidity()) {
+        setTimeout(() => {
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+            submitBtn.style.opacity = '1';
+        }, 1000);
+    }
+});
+</script>
+{% endblock %}
