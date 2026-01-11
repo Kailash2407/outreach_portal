@@ -64,9 +64,8 @@ def create_app():
                 print("--- SYSTEM READY: Admin 'admin' created ---")
 
     return app
-
+app = create_app()
 if __name__ == '__main__':
-    app = create_app()
     # For production, use host='0.0.0.0' and debug=False
     app.run(
         host='0.0.0.0', 
