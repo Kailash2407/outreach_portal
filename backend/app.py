@@ -19,7 +19,7 @@ def create_app():
     # --------------------------------------------------
     app.config['SECRET_KEY'] = os.environ.get(
         'SECRET_KEY',
-        'dev-secret-key-999'  # used only if env var missing
+        'dev-secret-key-999'
     )
 
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
@@ -34,7 +34,6 @@ def create_app():
     # --------------------------------------------------
     UPLOAD_FOLDER = os.path.join(app.root_path, 'static', 'uploads')
     app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
     os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
     # --------------------------------------------------
@@ -58,16 +57,16 @@ def create_app():
     app.register_blueprint(student_blueprint)
 
     # --------------------------------------------------
-    # 5. DATABASE INITIALIZATION (SAFE)
+    # 5. DATABASE INITIALIZATION (PRODUCTION SAFE)
     # --------------------------------------------------
     with app.app_context():
         try:
             db.create_all()
             print("✓ Database tables ensured")
 
-            # ❗ Admin creation ONLY for local/dev
-            if os.environ.get('FLASK_ENV') != 'production':
-                admin_user = User.query.filter_by(role='admin').first()
+            # ✅ Admin creation ONLY when explicitly enabled
+            if os.environ.get("CREATE_ADMIN") == "true":
+                admin_user = User.query.filter_by(username="admin").first()
                 if not admin_user:
                     admin = User(
                         name="System Admin",
@@ -78,13 +77,13 @@ def create_app():
                         dept="ADMINISTRATION",
                         sigbed_team="CORE"
                     )
-                    admin.set_password("admin123")
+                    admin.set_password("Admin@Outreach_2026!")
                     db.session.add(admin)
                     db.session.commit()
-                    print("✓ Dev admin user created")
+                    print("✓ Admin user created")
 
         except Exception as e:
-            # 🚨 Critical: do NOT crash production on DB warm-up/network delay
+            # Never crash production due to DB warm-up or network delay
             print("⚠️ Database initialization skipped:", str(e))
 
     return app
