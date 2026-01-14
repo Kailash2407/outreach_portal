@@ -4,6 +4,7 @@ import io
 from datetime import datetime
 from flask import send_file
 from werkzeug.utils import secure_filename
+from werkzeug.security import generate_password_hash  # ADD THIS
 from flask import current_app, Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_required, current_user
 from models import db, User, Pair, Team
@@ -36,61 +37,77 @@ def view_enrollments():
     students = User.query.filter_by(role='student').all()
     return render_template('admin_view_enrollments.html', students=students)
 
-# --- STUDENT MANAGEMENT ---
+# --- MEMBER ENROLLMENT (STUDENT & ADMIN) ---
 
-@admin.route('/enroll_student', methods=['GET', 'POST']) # Add this list
+@admin.route('/admin/enroll', methods=['GET', 'POST'])
 @login_required
-def enroll_student():
+def enroll_member():
+    """Enroll both students and admins/faculty"""
+    if current_user.role != 'admin':
+        return redirect(url_for('student.student_dashboard'))
+    
     if request.method == 'POST':
-        # --- Handle the Form Submission (Logic from before) ---
+        # Get common fields
+        name = request.form.get('name')
         username = request.form.get('username')
-        reg_num = request.form.get('register_number')
+        password = request.form.get('password')
+        role = request.form.get('role')  # 'student' or 'admin'
         
-        # Check for duplicates to avoid that IntegrityError
-        existing = User.query.filter((User.username == username) | (User.register_number == reg_num)).first()
-        if existing:
-            flash('Username or Register Number already exists!', 'danger')
-            return redirect(url_for('admin.enroll_student'))
+        # Check if username exists
+        existing_user = User.query.filter_by(username=username).first()
+        if existing_user:
+            flash('Username already exists!', 'danger')
+            return redirect(url_for('admin.enroll_member'))
+        
+        try:
+            if role == 'student':
+                # Create student
+                new_user = User(
+                    username=username,
+                    name=name,
+                    register_number=request.form.get('register_number'),
+                    section=request.form.get('section'),
+                    dept=request.form.get('dept'),
+                    sigbed_team=request.form.get('sigbed_team'),
+                    role='student'
+                )
+                new_user.set_password(password)
+                
+            elif role == 'admin':
+                # Create admin/faculty
+                new_user = User(
+                    username=username,
+                    name=name,
+                    role='admin',
+                    register_number='ADMIN',  # Default or get from form
+                    section='ADMIN',
+                    dept='ADMINISTRATION',
+                    sigbed_team='CORE'
+                )
+                new_user.set_password(password)
+                
+                # Optional: Add admin-specific fields if you have them
+                # employee_id = request.form.get('employee_id', '')
+                # designation = request.form.get('designation', 'Administrator')
+                
+            else:
+                flash('Invalid role selected', 'danger')
+                return redirect(url_for('admin.enroll_member'))
+            
+            db.session.add(new_user)
+            db.session.commit()
+            flash(f'Successfully enrolled {name} as {role}!', 'success')
+            return redirect(url_for('admin.view_enrollments'))
+            
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error enrolling member: {str(e)}', 'danger')
+            return redirect(url_for('admin.enroll_member'))
+    
+    # GET request - show enrollment form
+    return render_template('admin_enroll_member.html')  # Your HTML template name
 
-        new_student = User(
-            username=username,
-            name=request.form.get('name'),
-            register_number=reg_num,
-            section=request.form.get('section'),
-            dept=request.form.get('dept'),
-            sigbed_team=request.form.get('sigbed_team'),
-            role='student'
-        )
-        new_student.set_password('password123') 
-        
-        db.session.add(new_student)
-        db.session.commit()
-        flash('Student Enrolled Successfully!', 'success')
-        return redirect(url_for('admin.enroll_student'))
-
-    # If the method is GET, just show the enrollment page
-    return render_template('admin_enroll_student.html')
-    try:
-        new_student = User(
-            username=username,
-            register_number=reg_num,
-            name=request.form.get('name'),
-            section=request.form.get('section'),
-            dept=request.form.get('dept'),
-            sigbed_team=request.form.get('sigbed_team'),
-            role='student'
-        )
-        new_student.set_password('default123') # Or whatever your password logic is
-        
-        db.session.add(new_student)
-        db.session.commit()
-        flash('Student enrolled successfully!', 'success')
-        
-    except Exception as e:
-        db.session.rollback()
-        flash('An unexpected error occurred. Please try again.', 'danger')
-        
-    return redirect(url_for('admin.view_all_students'))
+# --- STUDENT MANAGEMENT ---
 
 @admin.route('/admin/delete_student/<int:user_id>')
 @login_required
@@ -209,45 +226,9 @@ def assign_mission(team_id):
         flash(f'Mission and materials updated for {team.team_name}!', 'success')
         return redirect(url_for('admin.view_teams'))
     return render_template('admin_assign_mission.html', team=team)
-@admin.route('/enroll', methods=['GET', 'POST'])
-@login_required
-def enroll_member():
-    if current_user.role != 'admin':
-        return redirect(url_for('main.index'))
 
-    if request.method == 'POST':
-        name = request.form.get('name')
-        email = request.form.get('email')
-        password = request.form.get('password')
-        # Capture the role from the dropdown
-        role = request.form.get('role') 
+# --- EXPORT FUNCTIONS ---
 
-        # Basic check to ensure a role was selected
-        if not role:
-            flash('Please select a role (Student or Faculty).', 'error')
-            return redirect(url_for('admin.enroll_member'))
-
-        # Check if user exists
-        user = User.query.filter_by(email=email).first()
-        if user:
-            flash('Email already registered.', 'error')
-            return redirect(url_for('admin.enroll_member'))
-
-        # Create new user with the assigned role
-        new_user = User(
-            name=name, 
-            email=email, 
-            password=generate_password_hash(password),
-            role=role  # This saves 'student' or 'admin'
-        )
-        
-        db.session.add(new_user)
-        db.session.commit()
-        
-        flash(f'Successfully enrolled {name} as {role.capitalize()}!', 'success')
-        return redirect(url_for('admin.admin_dashboard'))
-
-    return render_template('admin_enroll_students.html')
 @admin.route('/export/students')
 def export_students_csv():
     """Export all students to CSV"""
@@ -261,7 +242,7 @@ def export_students_csv():
         
         # Write headers
         writer.writerow(['Register Number', 'Name', 'Department', 'Section', 
-                         'SIGBED Team', 'Username', 'Email', 'Date Joined'])
+                         'SIGBED Team', 'Username', 'Date Joined'])
         
         # Write student data
         for user in students:
@@ -272,7 +253,6 @@ def export_students_csv():
                 user.section if hasattr(user, 'section') else '',
                 user.sigbed_team if hasattr(user, 'sigbed_team') else '',
                 user.username if hasattr(user, 'username') else '',
-                user.email if hasattr(user, 'email') else '',
                 user.date_joined.strftime('%Y-%m-%d %H:%M:%S') 
                 if hasattr(user, 'date_joined') and user.date_joined else ''
             ])
