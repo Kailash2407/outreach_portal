@@ -4,7 +4,6 @@ import io
 from datetime import datetime
 from flask import send_file
 from werkzeug.utils import secure_filename
-from werkzeug.security import generate_password_hash  # ADD THIS
 from flask import current_app, Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_required, current_user
 from models import db, User, Pair, Team
@@ -79,16 +78,12 @@ def enroll_member():
                     username=username,
                     name=name,
                     role='admin',
-                    register_number='ADMIN',  # Default or get from form
+                    register_number='ADMIN',
                     section='ADMIN',
                     dept='ADMINISTRATION',
                     sigbed_team='CORE'
                 )
                 new_user.set_password(password)
-                
-                # Optional: Add admin-specific fields if you have them
-                # employee_id = request.form.get('employee_id', '')
-                # designation = request.form.get('designation', 'Administrator')
                 
             else:
                 flash('Invalid role selected', 'danger')
@@ -105,7 +100,7 @@ def enroll_member():
             return redirect(url_for('admin.enroll_member'))
     
     # GET request - show enrollment form
-    return render_template('admin_enroll_member.html')  # Your HTML template name
+    return render_template('admin_enroll_student.html')  # Your HTML template name
 
 # --- STUDENT MANAGEMENT ---
 
@@ -277,36 +272,30 @@ def export_students_csv():
 def export_teams_csv():
     """Export all teams to CSV"""
     try:
-        # Assuming you have a Team model and relationship
-        # If not, you might need to adjust this
-        teams = Team.query.all() if hasattr(globals(), 'Team') else []
+        teams = Team.query.all()
         
         output = io.StringIO()
         writer = csv.writer(output)
         
         # Write headers
-        writer.writerow(['Team ID', 'Team Name', 'Total Members', 
-                         'Members List', 'Date Created', 'Status'])
+        writer.writerow(['Team ID', 'Team Name', 'School', 'Outreach Date', 
+                         'Topic', 'Total Pairs', 'Total Students', 'Status'])
         
         # Write team data
         for team in teams:
-            # Get member names from users with role='student'
-            members_list = ""
-            if hasattr(team, 'members'):
-                member_names = []
-                for member in team.members:
-                    if hasattr(member, 'name'):
-                        member_names.append(member.name)
-                members_list = ", ".join(member_names)
+            total_students = 0
+            for pair in team.pairs:
+                total_students += len(pair.students) if pair.students else 0
             
             writer.writerow([
-                team.id if hasattr(team, 'id') else '',
-                team.team_name if hasattr(team, 'team_name') else '',
-                len(team.members) if hasattr(team, 'members') else 0,
-                members_list,
-                team.date_created.strftime('%Y-%m-%d %H:%M:%S') 
-                if hasattr(team, 'date_created') and team.date_created else '',
-                team.status if hasattr(team, 'status') else ''
+                team.id,
+                team.team_name if team.team_name else '',
+                team.school_name if team.school_name else '',
+                team.outreach_date.strftime('%Y-%m-%d') if team.outreach_date else '',
+                team.topic if team.topic else '',
+                len(team.pairs) if team.pairs else 0,
+                total_students,
+                'Active' if team.pairs else 'Inactive'
             ])
         
         output.seek(0)
