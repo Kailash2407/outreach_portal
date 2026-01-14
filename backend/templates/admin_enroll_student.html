@@ -143,6 +143,17 @@
         transition: all 0.3s ease;
     }
     
+    /* Admin Fields Section */
+    .admin-fields {
+        background: #f0f9ff;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+        border: 1px solid #bae6fd;
+        transition: all 0.3s ease;
+        display: none;
+    }
+    
     .section-title {
         font-size: 0.875rem;
         font-weight: 600;
@@ -153,6 +164,10 @@
         display: flex;
         align-items: center;
         gap: 0.5rem;
+    }
+    
+    .admin-title {
+        color: #7c3aed;
     }
     
     /* Form Actions */
@@ -245,7 +260,7 @@
             font-size: 1.25rem;
         }
         
-        .student-fields {
+        .student-fields, .admin-fields {
             padding: 1.25rem;
         }
     }
@@ -263,7 +278,8 @@
 
         <!-- Form -->
         <div class="card-body">
-            <form method="POST" id="enrollmentForm">
+            <!-- IMPORTANT: Form submits to enroll_member route -->
+            <form method="POST" action="{{ url_for('admin.enroll_member') }}" id="enrollmentForm">
                 <!-- Role Selection -->
                 <div class="role-selector">
                     <label class="form-label required">User Role</label>
@@ -300,12 +316,12 @@
                         <div>
                             <label class="form-label required">Register Number</label>
                             <input type="text" name="register_number" class="form-control" 
-                                   placeholder="9923005200" required>
+                                   placeholder="9923005200" id="studentRegNumber" required>
                         </div>
                         
                         <div>
                             <label class="form-label required">Department</label>
-                            <select name="dept" class="form-select" required>
+                            <select name="dept" class="form-select" id="studentDept" required>
                                 <option value="" selected disabled>Select Department</option>
                                 <option value="CSE">Computer Science Engineering</option>
                                 <option value="IT">Information Technology</option>
@@ -313,6 +329,7 @@
                                 <option value="EEE">Electrical & Electronics</option>
                                 <option value="MECH">Mechanical Engineering</option>
                                 <option value="CIVIL">Civil Engineering</option>
+                                <option value="ADMINISTRATION">Administration</option>
                             </select>
                         </div>
                     </div>
@@ -321,12 +338,12 @@
                         <div>
                             <label class="form-label required">Section</label>
                             <input type="text" name="section" class="form-control" 
-                                   placeholder="e.g. A, B, C" required>
+                                   placeholder="e.g. A, B, C" id="studentSection" required>
                         </div>
                         
                         <div>
                             <label class="form-label required">SIGBED Team</label>
-                            <select name="sigbed_team" class="form-select" required>
+                            <select name="sigbed_team" class="form-select" id="studentTeam" required>
                                 <option value="" selected disabled>Select Team</option>
                                 <option value="Lens and Edit Team">Lens and Edit Team</option>
                                 <option value="Documentation Team">Documentation Team</option>
@@ -335,6 +352,37 @@
                                 <option value="Event Management Team">Event Management Team</option>
                                 <option value="Research and Analysis Team">Research and Analysis Team</option>
                                 <option value="Outreach Team">Outreach Team</option>
+                                <option value="CORE">CORE</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Admin Specific Fields (Hidden by default) -->
+                <div id="adminFields" class="admin-fields">
+                    <div class="section-title admin-title">
+                        <i class="bi bi-person-gear"></i>
+                        Faculty/Admin Information
+                    </div>
+                    
+                    <div class="form-row">
+                        <div>
+                            <label class="form-label">Employee ID (Optional)</label>
+                            <input type="text" name="employee_id" class="form-control" 
+                                   placeholder="EMP001" id="adminEmpId">
+                        </div>
+                        
+                        <div>
+                            <label class="form-label">Designation (Optional)</label>
+                            <select name="designation" class="form-select" id="adminDesignation">
+                                <option value="" selected>Select Designation</option>
+                                <option value="Professor">Professor</option>
+                                <option value="Assistant Professor">Assistant Professor</option>
+                                <option value="Associate Professor">Associate Professor</option>
+                                <option value="HOD">Head of Department</option>
+                                <option value="Coordinator">Program Coordinator</option>
+                                <option value="Administrator">System Administrator</option>
+                                <option value="Faculty Advisor">Faculty Advisor</option>
                             </select>
                         </div>
                     </div>
@@ -384,6 +432,7 @@ function selectRole(role) {
     const options = document.querySelectorAll('.role-option');
     const roleInput = document.getElementById('roleInput');
     const studentFields = document.getElementById('studentFields');
+    const adminFields = document.getElementById('adminFields');
     const submitBtn = document.getElementById('submitBtn');
     
     // Update active option
@@ -398,26 +447,44 @@ function selectRole(role) {
     // Update hidden input
     roleInput.value = role;
     
-    // Show/hide student fields
+    // Show/hide appropriate fields
     if (role === 'admin') {
+        // Hide student fields, show admin fields
         studentFields.style.display = 'none';
+        adminFields.style.display = 'block';
         submitBtn.innerHTML = '<i class="bi bi-check-lg"></i> Enroll Faculty/Admin';
         
-        // Remove required from student fields
+        // Set default values for admin (backend will use these)
+        document.getElementById('studentRegNumber').value = 'ADMIN';
+        document.getElementById('studentDept').value = 'ADMINISTRATION';
+        document.getElementById('studentSection').value = 'ADMIN';
+        document.getElementById('studentTeam').value = 'CORE';
+        
+        // Make student fields not required
         const studentInputs = studentFields.querySelectorAll('[required]');
         studentInputs.forEach(input => {
             input.required = false;
         });
+        
     } else {
+        // Show student fields, hide admin fields
         studentFields.style.display = 'block';
+        adminFields.style.display = 'none';
         submitBtn.innerHTML = '<i class="bi bi-check-lg"></i> Enroll Student';
         
-        // Add required back to student fields
-        const studentInputs = studentFields.querySelectorAll('input, select');
-        studentInputs.forEach(input => {
-            if (input.name !== 'dept' && input.name !== 'sigbed_team') {
-                input.required = true;
-            }
+        // Clear admin default values
+        document.getElementById('studentRegNumber').value = '';
+        document.getElementById('studentDept').value = '';
+        document.getElementById('studentSection').value = '';
+        document.getElementById('studentTeam').value = '';
+        
+        // Make student fields required again
+        const studentRequiredInputs = [
+            'studentRegNumber', 'studentDept', 'studentSection', 'studentTeam'
+        ];
+        studentRequiredInputs.forEach(id => {
+            const input = document.getElementById(id);
+            if (input) input.required = true;
         });
     }
 }
