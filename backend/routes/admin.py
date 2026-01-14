@@ -56,7 +56,7 @@ def enroll_member():
         existing_user = User.query.filter_by(username=username).first()
         if existing_user:
             flash('Username already exists!', 'danger')
-            return redirect(url_for('admin.enroll_member'))
+            return redirect(url_for('admin.enroll_student'))
         
         try:
             if role == 'student':
@@ -87,7 +87,7 @@ def enroll_member():
                 
             else:
                 flash('Invalid role selected', 'danger')
-                return redirect(url_for('admin.enroll_member'))
+                return redirect(url_for('admin.enroll_student'))
             
             db.session.add(new_user)
             db.session.commit()
@@ -97,7 +97,7 @@ def enroll_member():
         except Exception as e:
             db.session.rollback()
             flash(f'Error enrolling member: {str(e)}', 'danger')
-            return redirect(url_for('admin.enroll_member'))
+            return redirect(url_for('admin.enroll_student'))
     
     # GET request - show enrollment form
     return render_template('admin_enroll_student.html')  # Your HTML template name
